@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Result | Student Dropout Prediction System{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                <div class="card shadow-sm border-0 result-card">
+                    <div class="card-body p-5 text-center">
+                        <h2 class="section-title mb-4">Model Outcome</h2>
+
+                        <div class="result-badge {% if predicted_class == 'Dropout' %}danger{% else %}success{% endif %} mb-3">
+                            {{ predicted_class }}
+                        </div>
+
+                        {% if probabilities %}
+                            <p class="fs-5 mb-2"><strong>Class probabilities</strong></p>
+                            <div class="row g-2 mb-4">
+                                {% for label, probability in probabilities.items() %}
+                                    <div class="col-sm-4"><div class="info-item"><span>{{ label }}</span><strong>{{ '%.2f'|format(probability) }}%</strong></div></div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <p class="lead mb-4">{{ message }}</p>
+                        <p class="small text-muted">A prediction is decision support, not a certainty. Consider the model outcome alongside faculty review and student context.</p>
+
+                        <div class="d-flex justify-content-center gap-3 flex-wrap">
+                            <a href="{{ url_for('predict') }}" class="btn btn-primary">New Prediction</a>
+                            <a href="{{ url_for('student_dashboard' if role == 'student' else 'faculty_dashboard') }}" class="btn btn-outline-secondary">Dashboard</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

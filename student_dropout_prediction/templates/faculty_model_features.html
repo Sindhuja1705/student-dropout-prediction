@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}ML Features | Student Dropout Prediction System{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="dashboard-heading mb-4">
+            <div>
+                <p class="hero-tag mb-2">Model input data</p>
+                <h1 class="section-title mb-1">Complete ML Features</h1>
+                <p class="text-muted mb-0">Enter the student's actual values for the saved model. Attendance and semester records are not used as substitutes.</p>
+            </div>
+            <a href="{{ url_for('faculty_student_details', student_id=student.student_id) }}" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+
+        {% if errors %}<div class="alert alert-danger"><ul class="mb-0">{% for error in errors %}<li>{{ error }}</li>{% endfor %}</ul></div>{% endif %}
+
+        <form method="POST" class="dashboard-panel">
+            <h2>{{ student.student_name }} <span class="text-muted">({{ student.student_id }})</span></h2>
+            <p class="text-muted">These are the exact 11 numeric features expected by the saved 3-class model.</p>
+            <div class="row g-3 mt-1">
+                {% for field in fields %}
+                <div class="col-md-6">
+                    <label class="form-label" for="feature-{{ loop.index }}">{{ field.label }}</label>
+                    {% if field.options %}
+                    <select id="feature-{{ loop.index }}" name="{{ field.name }}" class="form-select" required>
+                        <option value="">Select a value</option>
+                        {% for value, label in field.options %}<option value="{{ value }}" {% if form.get(field.name)|string == value|string %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                    </select>
+                    {% else %}
+                    <input id="feature-{{ loop.index }}" name="{{ field.name }}" value="{{ form.get(field.name, '') }}" type="number" step="0.01" class="form-control" required>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <button type="submit" class="btn btn-primary mt-4">Save ML Features</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

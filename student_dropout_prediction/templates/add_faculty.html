@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Faculty | Student Dropout Prediction System{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="dashboard-heading mb-4">
+                    <div>
+                        <p class="hero-tag mb-2">Faculty actions</p>
+                        <h1 class="section-title mb-1">Add Faculty Account</h1>
+                    </div>
+                    <a href="{{ url_for('faculty_dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+                {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+                <form method="POST" class="dashboard-panel">
+                    <div class="mb-3"><label for="faculty_name" class="form-label">Faculty Name</label><input id="faculty_name" name="faculty_name" value="{{ form.get('faculty_name', '') }}" class="form-control" required></div>
+                    <div class="mb-3"><label for="faculty_id" class="form-label">Faculty ID</label><input id="faculty_id" name="faculty_id" value="{{ form.get('faculty_id', '') }}" class="form-control" required></div>
+                    <div class="mb-3"><label for="password" class="form-label">Password</label><input id="password" name="password" type="password" class="form-control" required></div>
+                    <button type="submit" class="btn btn-primary">Save Faculty Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

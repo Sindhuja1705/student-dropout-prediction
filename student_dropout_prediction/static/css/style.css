@@ -1,0 +1,298 @@
+body {
+    background: linear-gradient(135deg, #f8fbff 0%, #eef5ff 100%);
+    font-family: "Trebuchet MS", sans-serif;
+    color: #1e293b;
+}
+
+.hero-section {
+    padding: 80px 0;
+    background: radial-gradient(circle at top left, #dfeeff, #f8fbff 55%);
+}
+
+.page-section {
+    padding: 60px 0;
+}
+
+.min-vh-70 {
+    min-height: 70vh;
+}
+
+.hero-tag {
+    color: #2563eb;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    font-size: 0.8rem;
+}
+
+.section-title {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.cta-group .btn {
+    min-width: 180px;
+}
+
+.hero-card, .result-card {
+    border-radius: 18px;
+}
+
+.feature-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.result-badge {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-size: 1.05rem;
+}
+
+.result-badge.success {
+    background: rgba(34, 197, 94, 0.12);
+    color: #166534;
+}
+
+.result-badge.danger {
+    background: rgba(239, 68, 68, 0.12);
+    color: #991b1b;
+}
+
+.role-card, .dashboard-panel {
+    background: #ffffff;
+    border: 1px solid #dbe5f0;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 8px 24px rgba(30, 64, 92, 0.07);
+}
+
+.stat-card span {
+    display: block;
+    color: #64748b;
+    font-size: 0.8rem;
+}
+
+.stat-card strong {
+    display: block;
+    color: #0f3d70;
+    font-size: 1.8rem;
+    margin-top: 6px;
+}
+
+.feature-group {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 18px;
+}
+
+.feature-group h2 {
+    margin-bottom: 4px;
+}
+
+.early-warning {
+    border-left: 4px solid #dc2626;
+    background: #fff7ed;
+    padding: 14px 16px;
+}
+
+.role-card {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+}
+
+.login-role-nav .nav-link {
+    padding: 12px 16px;
+    border: 1px solid #dbe5f0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #334155;
+    font-weight: 700;
+}
+
+.login-role-nav .nav-link.active {
+    border-color: #0f766e;
+    background: #0f766e;
+    color: #ffffff;
+}
+
+.role-card h2, .dashboard-panel h2 {
+    color: #0f172a;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.dashboard-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+.info-item {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 14px;
+}
+
+.info-item span {
+    display: block;
+    color: #64748b;
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+}
+
+.student-list {
+    max-height: 480px;
+    overflow-y: auto;
+}
+
+.student-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+    text-decoration: none;
+}
+
+.student-row:hover, .student-row.active {
+    background: #eff6ff;
+    color: #1d4ed8;
+}
+
+.student-row small {
+    color: #64748b;
+}
+
+.risk-pill {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 10px 20px;
+    font-weight: 700;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    border-color: #16a34a;
+}
+
+.btn-outline-primary,
+.btn-primary,
+.btn-outline-secondary,
+.btn-success,
+.btn-outline-danger,
+.btn-danger {
+    border-radius: 10px;
+    font-weight: 600;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-primary:hover,
+.btn-success:hover,
+.btn-outline-primary:hover,
+.btn-outline-secondary:hover,
+.btn-danger:hover,
+.btn-outline-danger:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.12);
+}
+
+.risk-low { background: #dcfce7; color: #166534; }
+.risk-medium { background: #fef3c7; color: #92400e; }
+.risk-high { background: #fee2e2; color: #991b1b; }
+
+.semester-card {
+    background: #f8fafc;
+    border: 1px solid #dbe5f0;
+    border-left: 4px solid #2563eb;
+    border-radius: 10px;
+    padding: 18px;
+}
+
+.semester-card h3 {
+    color: #1e3a8a;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+}
+
+.model-note {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 10px;
+    color: #1e3a8a;
+    font-size: 0.9rem;
+    padding: 14px 16px;
+}
+
+.model-performance {
+    border-left: 4px solid #0f766e;
+}
+
+.model-performance-name {
+    color: #334155;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.model-accuracy {
+    min-width: 150px;
+    padding: 12px 18px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+}
+
+.model-accuracy span,
+.performance-metric span {
+    display: block;
+    color: #64748b;
+    font-size: 0.8rem;
+}
+
+.model-accuracy strong {
+    display: block;
+    color: #047857;
+    font-size: 1.65rem;
+}
+
+.performance-metric {
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.performance-metric strong {
+    display: block;
+    margin-top: 4px;
+    color: #0f3d70;
+    font-size: 1.1rem;
+}
+
+.table th, .table td {
+    vertical-align: middle;
+}
+
+@media (max-width: 767px) {
+    .hero-section {
+        padding: 50px 0;
+    }
+
+    .cta-group .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .dashboard-heading {
+        display: block;
+    }
+
+    .dashboard-heading .btn {
+        margin-top: 16px;
+    }
+}

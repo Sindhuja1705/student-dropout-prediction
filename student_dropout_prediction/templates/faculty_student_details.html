@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Details | Student Dropout Prediction System{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="dashboard-heading mb-4">
+            <div>
+                <p class="hero-tag mb-2">Student details</p>
+                <h1 class="section-title mb-1">{{ student.student_name }}</h1>
+                <p class="text-muted mb-0">Academic monitoring and faculty support review.</p>
+            </div>
+            <a href="{{ url_for('faculty_dashboard') }}" class="btn btn-outline-secondary">Back to Student List</a>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2 mb-4">
+            <form method="POST" action="{{ url_for('faculty_student_predict', student_id=student.student_id) }}" class="d-inline-block">
+                <button type="submit" class="btn btn-primary btn-lg">Predict Now</button>
+            </form>
+            <a href="{{ url_for('faculty_dashboard') }}" class="btn btn-outline-secondary btn-lg">Back to Student List</a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-6">
+                <div class="dashboard-panel h-100">
+                    <h2>Student Information</h2>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-6"><div class="info-item"><span>Student Name</span><strong>{{ student.student_name }}</strong></div></div>
+                        <div class="col-md-6"><div class="info-item"><span>Student ID</span><strong>{{ student.student_id }}</strong></div></div>
+                        <div class="col-md-6"><div class="info-item"><span>Course</span><strong>{{ student.course }}</strong></div></div>
+                        <div class="col-md-6"><div class="info-item"><span>Age</span><strong>{{ student.age }}</strong></div></div>
+                        <div class="col-md-6"><div class="info-item"><span>Gender</span><strong>{{ student.gender }}</strong></div></div>
+                        <div class="col-md-6"><div class="info-item"><span>Current Academic Year</span><strong>{{ student.current_year }}</strong></div></div>
+                        <div class="col-md-6"><div class="info-item"><span>Current Semester</span><strong>{{ student.current_semester }}</strong></div></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="dashboard-panel h-100">
+                    <h2>ML Prediction</h2>
+                    {% if prediction_error %}<div class="alert alert-warning mt-3">{{ prediction_error }}</div>{% endif %}
+                    {% if prediction_success %}<div class="alert alert-success mt-3">{{ prediction_success }}</div>{% endif %}
+                    {% if prediction_available and student.prediction %}
+                    <div class="border rounded p-3 mt-3">
+                        <p class="text-muted mb-1">Prediction Status</p>
+                        <p class="fw-semibold mb-2">Generated</p>
+                        <div class="result-badge {% if student.prediction == 'Dropout' %}danger{% else %}success{% endif %} mb-2">{{ student.prediction }}</div>
+                        <p class="mb-1"><strong>Predicted Outcome:</strong> {{ student.prediction }}</p>
+                        {% if student.probabilities %}<p class="mb-1"><strong>Model Confidence:</strong> {{ (student.probabilities.values() | max)|round(1) }}%</p>{% endif %}
+                        <p class="mb-0"><strong>Model:</strong> {{ model_name }}</p>
+                    </div>
+                    {% elif not prediction_available %}
+                    <div class="border rounded p-3 mt-3">
+                        <p class="mb-0">Prediction will be available after the updated model is trained and connected.</p>
+                    </div>
+                    {% else %}
+                    <div class="border rounded p-3 mt-3">
+                        <p class="text-muted mb-1">Prediction Status</p>
+                        <p class="fw-semibold mb-2">Requires More Information</p>
+                        <p class="mb-1"><strong>Action:</strong> Update the student's academic information and try again.</p>
+                    </div>
+                    {% endif %}
+                    {% if prediction_available and student.dropout_risk is not none %}
+                    <p class="mt-3 mb-1"><strong>Dropout Risk</strong></p>
+                    <p class="fs-4 mb-0">{{ student.dropout_risk|round(1) }}%</p>
+                    <p class="small mb-1"><strong>Predicted Outcome:</strong> {{ student.prediction }}</p>
+                    {% if 'Dropout' in student.probabilities %}<p class="small mb-1"><strong>Dropout Probability:</strong> {{ student.probabilities['Dropout']|round(1) }}%</p>{% endif %}
+                    {% if 'Enrolled' in student.probabilities %}<p class="small mb-1"><strong>Enrolled Probability:</strong> {{ student.probabilities['Enrolled']|round(1) }}%</p>{% endif %}
+                    {% if 'Graduate' in student.probabilities %}<p class="small mb-1"><strong>Graduate Probability:</strong> {{ student.probabilities['Graduate']|round(1) }}%</p>{% endif %}
+                    <p class="small mb-0"><strong>Risk Status:</strong> {{ student.risk_level }}</p>
+                    <p class="small text-muted mb-0">Risk level: {{ student.risk_level }}</p>
+                    {% for label, probability in student.probabilities.items() %}<p class="small mb-0">{{ label }}: {{ probability|round(1) }}%</p>{% endfor %}
+                    {% endif %}
+                    <p class="small text-muted mt-3 mb-0">This prediction is an academic decision-support indicator and is not a guarantee of future student outcome.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-panel mt-4">
+            <h2>Academic Progress</h2>
+            <p class="mb-3"><strong>Overall Attendance:</strong> {{ student.overall_attendance ~ '%' if student.overall_attendance is not none else 'Not available' }}</p>
+            <div class="row g-3 mt-2">
+                {% for semester in student.semesters %}
+                <div class="col-md-6"><div class="semester-card"><h3>{{ semester.label }}</h3><p class="mb-1"><strong>Total:</strong> {{ semester.total }} | <strong>Passed:</strong> {{ semester.passed }} | <strong>Failed:</strong> {{ semester.failed }}</p><p class="mb-1"><strong>Grade:</strong> {{ semester.grade if semester.grade is not none else 'Not available' }} | <strong>Attendance:</strong> {{ semester.attendance ~ '%' if semester.attendance is not none else 'Not available' }}</p><p class="mb-2"><strong>Pass Percentage:</strong> {{ semester.pass_percentage ~ '%' if semester.pass_percentage is not none else 'Not available' }}</p>{% if semester.courses %}<div class="table-responsive"><table class="table table-sm align-middle mb-0"><thead><tr><th>Subject Name</th><th>Marks</th><th>Attendance</th><th>Result</th></tr></thead><tbody>{% for subject in semester.courses %}<tr><td>{{ subject.name }}</td><td>{{ subject.marks }}</td><td>{{ subject.attendance }}%</td><td>{{ subject.status }}</td></tr>{% endfor %}</tbody></table></div>{% endif %}</div></div>
+                {% else %}<div class="col-12"><p class="text-muted mb-0">No semester results have been recorded.</p></div>{% endfor %}
+            </div>
+        </div>
+
+        <div class="dashboard-panel mt-4">
+            <h2>Academic Support</h2>
+            <p class="mb-2"><strong>Current prediction:</strong> {{ student.prediction or 'Not available' }}</p>
+            <p class="mb-2"><strong>Areas to review:</strong> {{ student.areas_to_review | join(', ') }}</p>
+            <p class="mb-0"><strong>Suggested support:</strong> {{ student.support_suggestions | join(', ') }}</p>
+        </div>
+
+        <div class="dashboard-panel mt-4">
+            <h2>Recommended Support</h2>
+            <ul class="mb-0">
+                {% for item in student.support_suggestions %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="dashboard-panel mt-4">
+            <h2>Provide Guidance</h2>
+            {% if student.support_notes %}<p class="text-muted mb-1">Last guidance: {{ student.support_notes }}</p><p class="small text-muted">Action: {{ student.action_taken or 'Not recorded' }} | Follow-up: {{ student.follow_up_date or 'Not scheduled' }}</p>{% endif %}
+            <form method="POST" action="{{ url_for('faculty_student_support', student_id=student.student_id) }}" class="row g-3 mt-1">
+                <div class="col-md-4"><label class="form-label" for="support_type">Support Category</label><select id="support_type" name="support_type" class="form-select" required><option value="">Select</option>{% for category in ['Academic Support', 'Attendance Improvement', 'Subject Mentoring', 'Extra Classes', 'Assignment Support', 'Exam Preparation', 'Counseling/General Support'] %}<option>{{ category }}</option>{% endfor %}</select></div>
+                <div class="col-md-4"><label class="form-label" for="support_status">Status</label><select id="support_status" name="support_status" class="form-select" required><option value="Pending">Pending</option><option value="In Progress">In Progress</option><option value="Completed">Completed</option></select></div>
+                <div class="col-md-6"><label class="form-label" for="follow_up_date">Follow-up Date</label><input id="follow_up_date" name="follow_up_date" type="date" class="form-control"></div>
+                <div class="col-md-6"><label class="form-label" for="action_taken">Action Taken</label><input id="action_taken" name="action_taken" class="form-control" required></div>
+                <div class="col-12"><label class="form-label" for="support_notes">Guidance / Comments</label><textarea id="support_notes" name="support_notes" rows="3" class="form-control" required></textarea></div>
+                <div class="col-12"><button type="submit" class="btn btn-primary">Save Guidance</button></div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Login | Student Dropout Prediction System{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xl-8">
+                <div class="text-center mb-4">
+                    <p class="hero-tag">Academic monitoring portal</p>
+                    <h1 class="section-title">Student Dropout Prediction System</h1>
+                    <p class="text-muted mb-0">Use your registered details to continue.</p>
+                </div>
+
+                {% if error %}
+                    <div class="alert alert-danger" role="alert">{{ error }}</div>
+                {% endif %}
+
+                {% set active_role = active_role|default('student') %}
+                <div class="nav nav-pills nav-fill login-role-nav mb-4" role="tablist" aria-label="Choose login type">
+                    <button class="nav-link {% if active_role == 'student' %}active{% endif %}" id="student-login-tab" data-bs-toggle="pill" data-bs-target="#student-login-panel" type="button" role="tab" aria-controls="student-login-panel" aria-selected="{{ 'true' if active_role == 'student' else 'false' }}">Student Login</button>
+                    <button class="nav-link {% if active_role == 'faculty' %}active{% endif %}" id="faculty-login-tab" data-bs-toggle="pill" data-bs-target="#faculty-login-panel" type="button" role="tab" aria-controls="faculty-login-panel" aria-selected="{{ 'true' if active_role == 'faculty' else 'false' }}">Faculty Login</button>
+                </div>
+
+                <div class="tab-content">
+                    <div class="tab-pane fade {% if active_role == 'student' %}show active{% endif %}" id="student-login-panel" role="tabpanel" aria-labelledby="student-login-tab" tabindex="0">
+                        <form method="POST" class="role-card">
+                            <input type="hidden" name="role" value="student">
+                            <p class="text-muted">Enter your student details to view your academic dashboard.</p>
+                            <div class="mb-3">
+                                <label for="student_name" class="form-label">Student Name</label>
+                                <input id="student_name" name="student_name" class="form-control" placeholder="Enter student name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="student_id" class="form-label">Student ID</label>
+                                <input id="student_id" name="student_id" class="form-control" placeholder="e.g. 001" required>
+                            </div>
+                            <button class="btn btn-primary w-100" type="submit">Student Login</button>
+                        </form>
+                    </div>
+
+                    <div class="tab-pane fade {% if active_role == 'faculty' %}show active{% endif %}" id="faculty-login-panel" role="tabpanel" aria-labelledby="faculty-login-tab" tabindex="0">
+                        <form method="POST" class="role-card">
+                            <input type="hidden" name="role" value="faculty">
+                            <p class="text-muted">Enter your faculty account details to monitor student performance.</p>
+                            <div class="mb-3">
+                                <label for="faculty_name" class="form-label">Faculty Name</label>
+                                <input id="faculty_name" name="faculty_name" class="form-control" placeholder="Enter faculty name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="faculty_id" class="form-label">Faculty ID</label>
+                                <input id="faculty_id" name="faculty_id" class="form-control" placeholder="Enter faculty ID" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input id="password" name="password" type="password" class="form-control" placeholder="Enter password" required>
+                            </div>
+                            <button class="btn btn-outline-primary w-100" type="submit">Faculty Login</button>
+                        </form>
+                    </div>
+                </div>
+
+                <p class="small text-muted text-center mt-4 mb-0">Faculty accounts are managed by signed-in faculty members.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

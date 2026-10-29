@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+
+{% block title %}Faculty Dashboard | Student Dropout Prediction System{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="dashboard-heading mb-4">
+            <div>
+                <p class="hero-tag mb-2">Faculty dashboard</p>
+                <h1 class="section-title mb-1">Faculty Dashboard</h1>
+                <p class="text-muted mb-0">Monitor student academic progress and provide early support.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ url_for('faculty_dashboard') }}" class="btn btn-outline-primary">Refresh</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-secondary">Log out</a>
+            </div>
+        </div>
+
+        {% with success = session.pop('success_message', None) %}
+            {% if success %}
+                <div class="alert alert-success">{{ success }}</div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-lg-2_4"><div class="dashboard-panel stat-card"><span>Total Students</span><strong>{{ summary.total }}</strong></div></div>
+            <div class="col-sm-6 col-lg-2_4"><div class="dashboard-panel stat-card"><span>Dropout</span><strong>{{ summary.dropout }}</strong></div></div>
+            <div class="col-sm-6 col-lg-2_4"><div class="dashboard-panel stat-card"><span>Enrolled</span><strong>{{ summary.enrolled }}</strong></div></div>
+            <div class="col-sm-6 col-lg-2_4"><div class="dashboard-panel stat-card"><span>Graduate</span><strong>{{ summary.graduate }}</strong></div></div>
+            <div class="col-sm-6 col-lg-2_4"><div class="dashboard-panel stat-card"><span>Students Requiring Attention</span><strong>{{ summary.attention }}</strong></div></div>
+            <div class="col-sm-6 col-lg-2_4"><div class="dashboard-panel stat-card"><span>Average Attendance</span><strong>{{ summary.average_attendance ~ '%' if summary.average_attendance is not none else 'N/A' }}</strong></div></div>
+            <div class="col-sm-6 col-lg-2_4"><div class="dashboard-panel stat-card"><span>Average Performance</span><strong>{{ summary.average_performance if summary.average_performance is not none else 'N/A' }}</strong></div></div>
+        </div>
+
+        <section class="dashboard-panel model-performance mb-4" aria-labelledby="model-performance-title">
+            {% if model_performance %}
+            <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-3">
+                <div>
+                    <p class="hero-tag mb-2">Model Performance</p>
+                    <h2 id="model-performance-title" class="mb-1">Final Selected Model</h2>
+                    <p class="model-performance-name mb-0">{{ model_performance.model }}</p>
+                </div>
+                <div class="model-accuracy" aria-label="Test accuracy">
+                    <span>Test Accuracy</span>
+                    <strong>{{ '%.2f'|format(model_performance.accuracy * 100) }}%</strong>
+                </div>
+            </div>
+            <div class="row g-3 model-metric-list">
+                <div class="col-6 col-md"><div class="performance-metric"><span>Macro F1</span><strong>{{ '%.2f'|format(model_performance.macro_f1 * 100) }}%</strong></div></div>
+                <div class="col-6 col-md"><div class="performance-metric"><span>Weighted F1</span><strong>{{ '%.2f'|format(model_performance.weighted_f1 * 100) }}%</strong></div></div>
+                <div class="col-6 col-md"><div class="performance-metric"><span>Precision</span><strong>{{ '%.2f'|format(model_performance.precision * 100) }}%</strong></div></div>
+                <div class="col-6 col-md"><div class="performance-metric"><span>Recall</span><strong>{{ '%.2f'|format(model_performance.recall * 100) }}%</strong></div></div>
+                <div class="col-6 col-md"><div class="performance-metric"><span>ROC-AUC</span><strong>{{ '%.2f'|format(model_performance.roc_auc * 100) }}%</strong></div></div>
+            </div>
+            {% else %}
+            <h2 id="model-performance-title" class="mb-1">Model Performance</h2>
+            <p class="text-muted mb-0">Notebook evaluation results are not available.</p>
+            {% endif %}
+        </section>
+
+        <div class="dashboard-panel mb-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+                <h2 class="mb-0">Student Monitoring</h2>
+                <div class="d-flex gap-2">
+                    <a href="{{ url_for('add_faculty') }}" class="btn btn-outline-primary">+ Add Faculty</a>
+                    <a href="{{ url_for('add_student') }}" class="btn btn-primary">+ Add New Student</a>
+                </div>
+            </div>
+            <form method="GET" action="{{ url_for('faculty_dashboard') }}" class="row g-3 align-items-end">
+                <div class="col-lg-4">
+                    <label class="form-label" for="search">Search students</label>
+                    <input id="search" name="search" value="{{ filters.get('search', '') }}" class="form-control" placeholder="Student Name or Student ID">
+                </div>
+                <div class="col-md-4 col-lg-3">
+                    <label class="form-label" for="prediction">Prediction Filter</label>
+                    <select id="prediction" name="prediction" class="form-select">
+                        <option value="">All</option>
+                        <option value="Dropout" {% if filters.get('prediction') == 'Dropout' %}selected{% endif %}>Dropout</option>
+                        <option value="Enrolled" {% if filters.get('prediction') == 'Enrolled' %}selected{% endif %}>Enrolled</option>
+                        <option value="Graduate" {% if filters.get('prediction') == 'Graduate' %}selected{% endif %}>Graduate</option>
+                    </select>
+                </div>
+                <div class="col-md-4 col-lg-2">
+                    <button class="btn btn-primary w-100" type="submit">Apply</button>
+                </div>
+                <div class="col-md-3"><label class="form-label" for="year">Year</label><select id="year" name="year" class="form-select"><option value="">All</option>{% for value in range(1, 5) %}<option value="{{ value }}" {% if filters.get('year') == value|string %}selected{% endif %}>{{ value }}{{ 'st' if value == 1 else 'nd' if value == 2 else 'rd' if value == 3 else 'th' }} Year</option>{% endfor %}</select></div>
+                <div class="col-md-3"><label class="form-label" for="semester">Semester</label><select id="semester" name="semester" class="form-select"><option value="">All</option>{% for value in range(1, 9) %}<option value="{{ value }}" {% if filters.get('semester') == value|string %}selected{% endif %}>Semester {{ value }}</option>{% endfor %}</select></div>
+                <div class="col-md-3"><label class="form-label" for="risk">Risk Level</label><select id="risk" name="risk" class="form-select"><option value="">All</option>{% for value in ['High', 'Medium', 'Low', 'Not available'] %}<option value="{{ value }}" {% if filters.get('risk') == value %}selected{% endif %}>{{ value }}</option>{% endfor %}</select></div>
+                <div class="col-md-3"><label class="form-label" for="course">Course/Branch</label><input id="course" name="course" value="{{ filters.get('course', '') }}" class="form-control"></div>
+            </form>
+        </div>
+
+        <div class="dashboard-panel">
+            {% if students %}
+            <div class="table-responsive mt-3">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Student Name</th>
+                            <th>Course</th>
+                            <th>Current Academic Year</th>
+                            <th>Semester</th>
+                            <th>Attendance</th>
+                            <th>Performance</th>
+                            <th>Prediction</th>
+                            <th>Dropout Risk</th>
+                            <th>Risk Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students %}
+                        <tr>
+                            <td>{{ student.student_id }}</td>
+                            <td>{{ student.student_name }}</td>
+                            <td>{{ student.course }}</td>
+                            <td>{{ student.current_year }}</td>
+                            <td>{{ student.current_semester }}</td>
+                            <td>{{ student.overall_attendance ~ '%' if student.overall_attendance is not none else 'N/A' }}</td>
+                            <td>{{ student.average_performance if student.average_performance is not none else 'N/A' }}</td>
+                            <td>{{ student.prediction or 'Not available' }}</td>
+                            <td>{{ student.dropout_risk|round(1) ~ '%' if student.dropout_risk is not none else 'Not available' }}</td>
+                            <td>
+                                {% if student.risk_level == 'High' %}
+                                    <span class="risk-pill risk-high">Requires Attention</span>
+                                {% elif student.risk_level == 'Medium' %}
+                                    <span class="risk-pill risk-medium">Monitor</span>
+                                {% elif student.risk_level == 'Low' %}
+                                    <span class="risk-pill risk-low">Low Risk</span>
+                                {% elif student.prediction is none %}
+                                    <span class="risk-pill">Not available</span>
+                                {% else %}
+                                    <span class="risk-pill risk-low">Normal</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <form method="POST" action="{{ url_for('faculty_student_predict', student_id=student.student_id) }}" class="d-inline-block mb-1">
+                                    <button type="submit" class="btn btn-sm btn-success">Predict</button>
+                                </form>
+                                <a href="{{ url_for('student_details', student_id=student.student_id) }}" class="btn btn-sm btn-outline-primary mb-1">View</a>
+                                <button type="button" class="btn btn-sm btn-outline-danger mb-1" data-bs-toggle="modal" data-bs-target="#deleteStudentModal" data-delete-url="{{ url_for('delete_student_record', student_id=student.student_id) }}">Delete</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted mt-3 mb-0">No student records match the current search or filter.</p>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<div class="modal fade" id="deleteStudentModal" tabindex="-1" aria-labelledby="deleteStudentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="deleteStudentModalLabel">Delete student</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">Are you sure you want to delete this student?</div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <form id="deleteStudentForm" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('deleteStudentModal').addEventListener('show.bs.modal', function (event) {
+        document.getElementById('deleteStudentForm').action = event.relatedTarget.dataset.deleteUrl;
+    });
+</script>
+{% endblock %}

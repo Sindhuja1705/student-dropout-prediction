@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+
+{% block title %}Add New Student | Student Dropout Prediction System{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="dashboard-heading mb-4">
+                    <div>
+                        <p class="hero-tag mb-2">Faculty actions</p>
+                        <h1 class="section-title mb-1">Add New Student</h1>
+                    </div>
+                    <a href="{{ url_for('faculty_dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+
+                <form method="POST" action="{{ url_for('add_student') }}" class="dashboard-panel">
+                    <h2>Student Information</h2>
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label class="form-label" for="student_name">Student Name</label>
+                            <input id="student_name" name="student_name" value="{{ form.get('student_name','') }}" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="student_id">Student ID</label>
+                            <input id="student_id" name="student_id" value="{{ form.get('student_id','') }}" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label" for="course">Course</label>
+                            <select id="course" name="course" class="form-select" required>
+                                <option value="">Select course</option>
+                                {% for label, model_code in course_options %}<option value="{{ label }}" {% if form.get('course') == label %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="age">Age</label>
+                            <input id="age" name="age" value="{{ form.get('age','') }}" type="number" min="1" class="form-control" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="gender">Gender</label>
+                            <select id="gender" name="gender" class="form-select" required>
+                                <option value="">Select</option>
+                                <option value="Male" {% if form.get('gender') == 'Male' %}selected{% endif %}>Male</option>
+                                <option value="Female" {% if form.get('gender') == 'Female' %}selected{% endif %}>Female</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="current_year">Current Academic Year</label>
+                            <select id="current_year" name="current_year" class="form-select" required>
+                                <option value="">Select</option>
+                                {% for year in range(1, 5) %}<option value="{{ year }}" {% if form.get('current_year') == year|string %}selected{% endif %}>{{ year }}{{ 'st' if year == 1 else 'nd' if year == 2 else 'rd' if year == 3 else 'th' }} Year</option>{% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="current_semester">Current Semester</label>
+                            <select id="current_semester" name="current_semester" class="form-select" required>
+                                <option value="">Select</option>
+                                {% for semester in range(1, 9) %}<option value="{{ semester }}" {% if form.get('current_semester') == semester|string %}selected{% endif %}>Semester {{ semester }}</option>{% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <h2 class="mt-4">Academic Information</h2>
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-6">
+                            <label class="form-label" for="previous_qualification_grade">Previous Qualification Grade</label>
+                            <input id="previous_qualification_grade" name="previous_qualification_grade" value="{{ form.get('previous_qualification_grade','') }}" type="number" min="0" step="0.01" class="form-control" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="tuition_fees_up_to_date">Tuition Fees Up To Date</label>
+                            <select id="tuition_fees_up_to_date" name="tuition_fees_up_to_date" class="form-select" required>
+                                <option value="">Select</option>
+                                <option value="Yes" {% if form.get('tuition_fees_up_to_date') == 'Yes' %}selected{% endif %}>Yes</option>
+                                <option value="No" {% if form.get('tuition_fees_up_to_date') == 'No' %}selected{% endif %}>No</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label" for="scholarship_holder">Scholarship Holder</label>
+                            <select id="scholarship_holder" name="scholarship_holder" class="form-select" required>
+                                <option value="">Select</option>
+                                <option value="Yes" {% if form.get('scholarship_holder') == 'Yes' %}selected{% endif %}>Yes</option>
+                                <option value="No" {% if form.get('scholarship_holder') == 'No' %}selected{% endif %}>No</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <h2 class="mt-4">Semester Results</h2>
+                    <p class="text-muted">Complete only semesters with actual results. Leave future semesters empty.</p>
+                    <div class="accordion mt-3" id="semesterAccordion">
+                        {% for semester in range(1, 9) %}
+                        <div class="accordion-item">
+                            <h3 class="accordion-header" id="semesterHeading{{ semester }}"><button class="accordion-button {% if semester > 1 %}collapsed{% endif %}" type="button" data-bs-toggle="collapse" data-bs-target="#semesterPanel{{ semester }}">{{ semester }}{{ 'st' if semester == 1 else 'nd' if semester == 2 else 'rd' if semester == 3 else 'th' }} Semester</button></h3>
+                            <div id="semesterPanel{{ semester }}" class="accordion-collapse collapse {% if semester == 1 %}show{% endif %}" data-bs-parent="#semesterAccordion">
+                                <div class="accordion-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-3"><label class="form-label" for="semester_{{ semester }}_total">Total Subjects/Credits</label><input id="semester_{{ semester }}_total" name="semester_{{ semester }}_total" value="{{ form.get('semester_' ~ semester ~ '_total','') }}" type="number" min="1" step="1" class="form-control"></div>
+                                        <div class="col-md-3"><label class="form-label" for="semester_{{ semester }}_passed">Subjects/Credits Passed</label><input id="semester_{{ semester }}_passed" name="semester_{{ semester }}_passed" value="{{ form.get('semester_' ~ semester ~ '_passed','') }}" type="number" min="0" step="1" class="form-control"></div>
+                                        <div class="col-md-3"><label class="form-label" for="semester_{{ semester }}_grade">Grade/Score</label><input id="semester_{{ semester }}_grade" name="semester_{{ semester }}_grade" value="{{ form.get('semester_' ~ semester ~ '_grade','') }}" type="number" min="0" max="100" step="0.01" class="form-control"></div>
+                                        <div class="col-md-3"><label class="form-label" for="semester_{{ semester }}_attendance">Attendance %</label><input id="semester_{{ semester }}_attendance" name="semester_{{ semester }}_attendance" value="{{ form.get('semester_' ~ semester ~ '_attendance','') }}" type="number" min="0" max="100" step="0.01" class="form-control"></div>
+                                        <div class="col-12">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <label class="form-label mb-0">Subjects</label>
+                                                <button type="button" class="btn btn-sm btn-outline-primary add-subject" data-semester="{{ semester }}">+ Add Subject</button>
+                                            </div>
+                                            <div class="table-responsive">
+                                                <table class="table table-sm align-middle subject-table mb-0">
+                                                    <thead><tr><th>Subject Name</th><th>Marks</th><th>Attendance %</th><th>Result</th><th>Remove</th></tr></thead>
+                                                    <tbody id="subjects-{{ semester }}"></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">Save Student</button>
+                        <a href="{{ url_for('faculty_dashboard') }}" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.add-subject').forEach(function (button) {
+            button.addEventListener('click', function () {
+                const semester = button.dataset.semester;
+                const row = document.createElement('tr');
+                row.innerHTML = `<td><input name="semester_${semester}_subject_name[]" class="form-control" required></td>
+                    <td><input name="semester_${semester}_subject_marks[]" type="number" min="0" max="100" step="0.01" class="form-control" required></td>
+                    <td><input name="semester_${semester}_subject_attendance[]" type="number" min="0" max="100" step="0.01" class="form-control" required></td>
+                    <td><select name="semester_${semester}_subject_result[]" class="form-select" required><option value="">Select</option><option value="Passed">Passed</option><option value="Failed">Failed</option></select></td>
+                    <td><button type="button" class="btn btn-sm btn-outline-danger remove-subject">Remove</button></td>`;
+                row.querySelector('.remove-subject').addEventListener('click', function () { row.remove(); });
+                document.getElementById('subjects-' + semester).appendChild(row);
+            });
+        });
+    });
+</script>
+{% endblock %}

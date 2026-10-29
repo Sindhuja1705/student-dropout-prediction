@@ -1,0 +1,16 @@
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.env
+.ipynb_checkpoints/
+*.db
+oulad_dataset/*.csv
+student_dropout_prediction/dataset/*.csv
+sdps/student_dropout_prediction/dataset/*.csv
+student_dropout_prediction/models/
+sdps/student_dropout_prediction/models/
+student_dropout_prediction/ml_backups/
+*.pkl
+*.joblib
